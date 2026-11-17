@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#5a3a22">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<title>แลกเงินพกพา</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Kanit:wght@500;600;700&family=Sarabun:wght@400;600&display=swap">
+<style>
+/* Fortress-wall theme, single dark look. Full-height phone layout: header, exchange plate, rate, quick chips, keypad fills the rest */
+:root{
+  --stone:#2b2723;--stone2:#36302a;--mortar:#1c1916;
+  --plate:#e9dcc2;--plate-ink:#2a2018;--plate-line:#c9b593;
+  --leather:#5a3a22;--leather2:#7a5132;
+  --brass:#c8a24a;--brass-dk:#8a6a24;
+  --blood:#a3221b;--blood-hi:#cf3a2e;
+  --iron:#3d3833;--iron-hi:#4b453f;--text:#efe6d6;--muted:#b3a68f;
+  --fd:"Oswald","Kanit",sans-serif;--fth:"Kanit",sans-serif;--fb:"Sarabun","Kanit",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{color:var(--text);font:15px/1.45 var(--fb);overflow:hidden;
+  background:
+    linear-gradient(180deg,rgba(0,0,0,.15),rgba(0,0,0,.55)),
+    repeating-linear-gradient(0deg,transparent 0 46px,var(--mortar) 46px 49px),
+    repeating-linear-gradient(90deg,transparent 0 94px,var(--mortar) 94px 97px),
+    linear-gradient(135deg,var(--stone2),var(--stone));
+  padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+button,input{font:inherit;color:inherit}
+button:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+
+.app{max-width:440px;height:100%;margin:0 auto;display:flex;flex-direction:column;gap:clamp(6px,1.4vh,12px);padding-block:clamp(8px,1.6vh,14px) clamp(8px,1.4vh,12px)}
+
+/* leather strap header */
+header{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:linear-gradient(180deg,var(--leather2),var(--leather));border-radius:10px;padding:8px 12px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 4px 10px rgba(0,0,0,.4);border:1px dashed rgba(233,220,194,.35)}
+.crest{display:flex;align-items:center;gap:10px;min-width:0}
+.badge{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle at 35% 30%,#f0d07a,var(--brass) 45%,var(--brass-dk));color:var(--plate-ink);
+  font:700 15px/1 var(--fd);box-shadow:0 0 0 2px var(--mortar),0 2px 4px rgba(0,0,0,.5)}
+header h1{margin:0;font:700 clamp(17px,4.6vw,20px)/1.1 var(--fth);letter-spacing:.02em;white-space:nowrap}
+header small{display:block;font:500 11px/1.2 var(--fd);letter-spacing:.18em;color:var(--brass);text-transform:uppercase}
+.ghost{border:1.5px solid var(--brass);background:rgba(0,0,0,.25);color:var(--plate);border-radius:6px;padding:5px 10px;font:600 13px/1 var(--fth);cursor:pointer;flex:none}
+
+/* riveted parchment plate */
+.board{position:relative;background:linear-gradient(180deg,#efe3ca,var(--plate));color:var(--plate-ink);border-radius:8px;
+  border:3px solid var(--iron);box-shadow:0 0 0 1px var(--mortar),0 8px 18px rgba(0,0,0,.5)}
+.board::before,.board::after{content:"";position:absolute;top:6px;width:7px;height:7px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#8a8178,#3a342e);box-shadow:0 calc(100% + 0px) 0 transparent}
+.board::before{left:6px}.board::after{right:6px}
+.row{display:flex;align-items:center;gap:10px;padding:clamp(10px,2vh,14px) 14px}
+.row+.row{border-top:2px dashed var(--plate-line)}
+.cur{display:flex;align-items:center;gap:8px;border:0;cursor:pointer;flex:none;border-radius:6px;padding:7px 9px;
+  background:var(--leather);color:var(--plate);box-shadow:inset 0 -2px 0 rgba(0,0,0,.3)}
+.cur .cc{display:grid;text-align:left;gap:1px}
+.cur b{font:700 17px/1 var(--fd);letter-spacing:.06em}
+.cur small{font:400 11px/1.1 var(--fb);opacity:.85}
+.val{flex:1;min-width:0;text-align:right;font:600 clamp(26px,8vw,34px)/1.05 var(--fd);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.row.to .val{color:var(--blood)}
+.caret{display:inline-block;width:2px;height:.9em;background:var(--blood);margin-left:2px;vertical-align:-.08em;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.mid{position:relative;height:0}
+/* gear-shaped swap */
+.swap{position:absolute;left:50%;top:-21px;transform:translateX(-50%);width:42px;height:42px;border:0;border-radius:50%;cursor:pointer;
+  background:repeating-conic-gradient(var(--brass) 0 15deg,var(--brass-dk) 15deg 30deg);display:grid;place-items:center;
+  box-shadow:0 0 0 3px var(--iron),0 3px 6px rgba(0,0,0,.5);transition:transform .45s}
+.swap span{width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f0d07a,var(--brass));display:grid;place-items:center;color:var(--plate-ink);font-weight:700;font-size:16px}
+.swap.spin{transform:translateX(-50%) rotate(180deg)}
+@media (prefers-reduced-motion:reduce){.caret{animation:none}.swap{transition:none}}
+
+.rateline{margin:0;text-align:center;font-size:12.5px;color:var(--muted);text-shadow:0 1px 2px #000}
+.rateline b{color:var(--brass);font:600 13.5px var(--fd);font-variant-numeric:tabular-nums}
+
+.quick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.q{border:1px solid var(--iron-hi);background:rgba(20,17,14,.72);border-left:3px solid var(--blood);border-radius:6px;padding:6px 8px;text-align:left;cursor:pointer;min-width:0}
+.q b{display:block;font:600 11.5px/1.2 var(--fd);letter-spacing:.1em;color:var(--brass)}
+.q span{display:block;font:600 14px/1.3 var(--fd);font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-height:680px){.q:nth-child(n+4){display:none}}
+
+/* iron keypad fills remaining height */
+.pad{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:minmax(44px,1fr);gap:clamp(6px,1.2vh,9px);
+  padding:clamp(8px,1.4vh,10px);background:rgba(15,13,11,.6);border-radius:12px;border:1px solid var(--iron-hi)}
+.key{border:0;border-radius:8px;cursor:pointer;font:600 clamp(20px,6vw,26px)/1 var(--fd);color:var(--text);
+  background:linear-gradient(180deg,var(--iron-hi),var(--iron));box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 3px 0 var(--mortar)}
+.key:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 1px 0 var(--mortar)}
+.key.op{background:linear-gradient(180deg,var(--leather2),var(--leather));font-size:clamp(16px,4.6vw,19px)}
+.key.go{background:linear-gradient(180deg,var(--blood-hi),var(--blood));color:#fff}
+
+/* bottom sheets */
+.sheet{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.65);display:flex;align-items:flex-end;justify-content:center}
+.panel{width:100%;max-width:440px;max-height:85%;overflow:auto;background:var(--plate);color:var(--plate-ink);border-top:4px solid var(--blood);border-radius:14px 14px 0 0;
+  padding:16px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.panel h2{margin:0 0 4px;font:700 19px/1.3 var(--fth)}
+.panel p{margin:0 0 10px;font-size:13px;color:#5d4c3a}
+.list{display:grid;gap:3px}
+.opt{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;border-radius:6px;padding:10px;text-align:left;cursor:pointer;color:var(--plate-ink)}
+.opt[aria-current="true"]{background:var(--leather);color:var(--plate)}
+.opt b{font:700 16px/1 var(--fd);width:46px;letter-spacing:.05em}
+.rr{display:grid;grid-template-columns:52px minmax(0,1fr) auto;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--plate-line)}
+.rr b{font:700 15px/1 var(--fd)}
+.rr input{width:100%;border:1.5px solid var(--plate-line);border-radius:6px;padding:8px 9px;background:#fbf5e8;color:var(--plate-ink);text-align:right;font-variant-numeric:tabular-nums}
+.rr input:focus{outline:0;border-color:var(--blood)}
+.rr small{font-size:12px;color:#5d4c3a}
+.actions{display:flex;gap:8px;margin-top:12px}
+.btn{flex:1;border:0;border-radius:8px;padding:12px;font:600 15px var(--fth);cursor:pointer;background:var(--plate-line);color:var(--plate-ink)}
+.btn.main{background:var(--blood);color:#fff}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div class="crest"><span class="badge" aria-hidden="true">฿</span><div><small>Currency Converter</small><h1>แปลงค่าเงิน</h1></div></div>
+    <button type="button" class="ghost" id="editRates">แก้เรท</button>
+  </header>
+
+  <div class="board">
+    <div class="row from"><button type="button" class="cur" id="fromBtn"></button><div class="val" id="fromVal" aria-live="polite"></div></div>
+    <div class="mid"><button type="button" class="swap" id="swap" aria-label="สลับสกุลเงิน"><span>&#8645;</span></button></div>
+    <div class="row to"><button type="button" class="cur" id="toBtn"></button><div class="val" id="toVal" aria-live="polite"></div></div>
+  </div>
+  <p class="rateline" id="rateline"></p>
+
+  <div class="quick" id="quick"></div>
+
+  <div class="pad" id="pad">
+    <button type="button" class="key" data-k="7">7</button><button type="button" class="key" data-k="8">8</button><button type="button" class="key" data-k="9">9</button><button type="button" class="key op" data-k="back" aria-label="ลบ">&#9003;</button>
+    <button type="button" class="key" data-k="4">4</button><button type="button" class="key" data-k="5">5</button><button type="button" class="key" data-k="6">6</button><button type="button" class="key op" data-k="clear">C</button>
+    <button type="button" class="key" data-k="1">1</button><button type="button" class="key" data-k="2">2</button><button type="button" class="key" data-k="3">3</button><button type="button" class="key op" data-k="000">000</button>
+    <button type="button" class="key" data-k="0">0</button><button type="button" class="key" data-k="00">00</button><button type="button" class="key" data-k=".">.</button><button type="button" class="key go" data-k="swap" aria-label="สลับสกุลเงิน">&#8645;</button>
+  </div>
+</div>
+
+<div class="sheet" id="pickSheet" hidden><div class="panel"><h2 id="pickTitle">เลือกสกุลเงิน</h2><div class="list" id="pickList"></div></div></div>
+
+<div class="sheet" id="rateSheet" hidden><div class="panel">
+  <h2>แก้อัตราแลกเปลี่ยน</h2>
+  <p>ใส่ราคา 1 หน่วยเป็นบาท ดูเรทจริงจากแอปธนาคารหรือร้านแลกเงิน แล้วกรอกตามนั้น ระบบจำไว้ในเครื่องนี้</p>
+  <div id="rateList"></div>
+  <div class="actions"><button type="button" class="btn" id="resetRates">คืนค่าเริ่มต้น</button><button type="button" class="btn main" id="saveRates">บันทึก</button></div>
+</div></div>
+
+<script>
+// Mid-market rates, THB per 1 unit, snapshot of 17 Nov 2026 (open.er-api.com); user-editable
+const DEFAULT_RATES = {
+  THB: 1, USD: 33.887, EUR: 37.297, GBP: 44.695, JPY: 0.21233, CNY: 5.0679, KRW: 0.025380,
+  SGD: 26.290, HKD: 4.3188, MYR: 8.2759, TWD: 1.0282, AUD: 22.861, VND: 0.0013200, LAK: 0.0015200
+};
+let srcLabel = () => (st.edited ? 'เรทที่คุณแก้เอง' : 'เรทกลาง 17 พ.ย. 69 กด "แก้เรท" ใส่เรทจริง');
+const NAMES = {
+  THB: 'บาท', USD: 'ดอลลาร์สหรัฐ', EUR: 'ยูโร', GBP: 'ปอนด์', JPY: 'เยน', CNY: 'หยวน', KRW: 'วอน',
+  SGD: 'ดอลลาร์สิงคโปร์', HKD: 'ดอลลาร์ฮ่องกง', MYR: 'ริงกิต', TWD: 'ดอลลาร์ไต้หวัน', AUD: 'ดอลลาร์ออสเตรเลีย', VND: 'ด่ง', LAK: 'กีบ'
+};
+const KEY = 'fx-pocket-v1';
+const $ = (s) => document.querySelector(s);
+
+let st = { from: 'USD', to: 'THB', amt: '100', rates: { ...DEFAULT_RATES }, edited: false };
+try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s) st = { ...st, ...s, rates: { ...DEFAULT_RATES, ...(s.rates || {}) } }; } catch (e) { /* storage unavailable */ }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) { /* ignore */ } };
+
+const conv = (a, f, t) => a * st.rates[f] / st.rates[t];
+function fmt(n) {
+  if (!isFinite(n)) return '0';
+  const abs = Math.abs(n);
+  const d = abs === 0 ? 0 : abs < 0.01 ? 6 : abs < 1 ? 4 : 2;
+  return n.toLocaleString('en-US', { minimumFractionDigits: abs >= 1 ? 2 : 0, maximumFractionDigits: d });
+}
+function showAmt(s) {
+  const [i, f] = s.split('.');
+  const int = Number(i || 0).toLocaleString('en-US');
+  return f !== undefined ? int + '.' + f : int;
+}
+const curHtml = (c) => `<span class="cc"><b>${c}</b><small>${NAMES[c]}</small></span><span aria-hidden="true">&#9662;</span>`;
+
+function render() {
+  const a = parseFloat(st.amt) || 0;
+  $('#fromBtn').innerHTML = curHtml(st.from);
+  $('#toBtn').innerHTML = curHtml(st.to);
+  $('#fromVal').innerHTML = showAmt(st.amt || '0') + '<span class="caret"></span>';
+  $('#toVal').textContent = fmt(conv(a, st.from, st.to));
+  $('#rateline').innerHTML = `1 ${st.from} = <b>${fmt(conv(1, st.from, st.to))}</b> ${st.to} · ${srcLabel()}`;
+  const others = Object.keys(st.rates).filter((c) => c !== st.from && c !== st.to).slice(0, 6);
+  $('#quick').innerHTML = others.map((c) => `<button type="button" class="q" data-q="${c}"><b>${c}</b><span>${fmt(conv(a, st.from, c))}</span></button>`).join('');
+  save();
+}
+
+let spun = false;
+function swap() {
+  [st.from, st.to] = [st.to, st.from];
+  spun = !spun; $('#swap').classList.toggle('spin', spun);
+  render();
+}
+function press(k) {
+  let s = st.amt;
+  if (k === 'back') s = s.slice(0, -1);
+  else if (k === 'clear') s = '';
+  else if (k === 'swap') { swap(); return; }
+  else if (k === '.') { if (!s.includes('.')) s = (s || '0') + '.'; }
+  else {
+    if (s.includes('.') && s.split('.')[1].length + k.length > 4) return;
+    if (s.replace('.', '').length + k.length > 12) return;
+    s = (s === '0' ? '' : s) + k;
+    if (/^0+$/.test(s)) s = '0';
+  }
+  st.amt = s; render();
+}
+$('#pad').addEventListener('click', (e) => { const b = e.target.closest('[data-k]'); if (b) press(b.dataset.k); });
+document.addEventListener('keydown', (e) => {
+  if (!$('#rateSheet').hidden || !$('#pickSheet').hidden) { if (e.key === 'Escape') closeSheets(); return; }
+  if (/^[0-9]$/.test(e.key)) press(e.key);
+  else if (e.key === '.' || e.key === ',') press('.');
+  else if (e.key === 'Backspace') press('back');
+  else if (e.key === 'Escape') press('clear');
+});
+$('#swap').onclick = swap;
+$('#quick').addEventListener('click', (e) => { const b = e.target.closest('[data-q]'); if (b) { st.to = b.dataset.q; render(); } });
+
+// currency picker
+let picking = 'from';
+function openPick(which) {
+  picking = which;
+  $('#pickTitle').textContent = which === 'from' ? 'แปลงจาก' : 'แปลงเป็น';
+  const cur = st[which];
+  $('#pickList').innerHTML = Object.keys(st.rates).map((c) => `<button type="button" class="opt" data-c="${c}" aria-current="${c === cur}"><b>${c}</b><span>${NAMES[c]}</span></button>`).join('');
+  $('#pickSheet').hidden = false;
+}
+$('#fromBtn').onclick = () => openPick('from');
+$('#toBtn').onclick = () => openPick('to');
+$('#pickList').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-c]'); if (!b) return;
+  const other = picking === 'from' ? 'to' : 'from';
+  if (b.dataset.c === st[other]) st[other] = st[picking];
+  st[picking] = b.dataset.c; closeSheets(); render();
+});
+
+// rate editor
+function openRates() {
+  $('#rateList').innerHTML = Object.keys(st.rates).filter((c) => c !== 'THB').map((c) =>
+    `<label class="rr"><b>${c}</b><input type="text" inputmode="decimal" id="r-${c}" value="${st.rates[c]}"><small>บาท</small></label>`).join('');
+  $('#rateSheet').hidden = false;
+}
+$('#editRates').onclick = openRates;
+$('#saveRates').onclick = () => {
+  Object.keys(st.rates).forEach((c) => {
+    if (c === 'THB') return;
+    const v = parseFloat(String($('#r-' + c).value).replace(/,/g, ''));
+    if (v > 0) st.rates[c] = v;
+  });
+  st.edited = true; closeSheets(); render();
+};
+$('#resetRates').onclick = () => { st.rates = { ...DEFAULT_RATES }; st.edited = false; closeSheets(); render(); };
+
+function closeSheets() { $('#pickSheet').hidden = true; $('#rateSheet').hidden = true; }
+document.querySelectorAll('.sheet').forEach((s) => s.addEventListener('click', (e) => { if (e.target === s) closeSheets(); }));
+
+render();
+
+const API = 'https://open.er-api.com/v6/latest/THB';
+const fmtDate = (ms) => new Date(ms).toLocaleString('th-TH', { day: 'numeric', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+srcLabel = () => {
+  if (st.edited) return 'เรทที่คุณแก้เอง';
+  if (st.live) return 'เรทกลางวันนี้ อัปเดต ' + fmtDate(st.live.at) + (navigator.onLine ? '' : ' (ออฟไลน์)');
+  return 'กำลังโหลดเรทล่าสุด...';
+};
+if (st.live && !st.edited) st.rates = { ...DEFAULT_RATES, ...st.live.rates };
+async function loadLive() {
+  try {
+    const r = await fetch(API, { cache: 'no-store' });
+    const j = await r.json();
+    if (j.result !== 'success') throw new Error('bad response');
+    const rates = { THB: 1 };
+    Object.keys(DEFAULT_RATES).forEach((c) => { if (c !== 'THB' && j.rates[c]) rates[c] = +(1 / j.rates[c]).toPrecision(6); });
+    st.live = { rates, at: j.time_last_update_unix * 1000 };
+    if (!st.edited) st.rates = { ...DEFAULT_RATES, ...rates };
+  } catch (e) { /* offline: keep last saved rates */ }
+  render();
+}
+$('#resetRates').onclick = () => { st.rates = { ...DEFAULT_RATES, ...(st.live ? st.live.rates : {}) }; st.edited = false; closeSheets(); render(); loadLive(); };
+document.addEventListener('visibilitychange', () => { if (!document.hidden) loadLive(); });
+loadLive();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+</script>
+
+</body>
+</html>
