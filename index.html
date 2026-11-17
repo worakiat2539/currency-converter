@@ -413,7 +413,15 @@ async function loadLive() {
 $('#resetRates').onclick = () => { st.rates = { ...DEFAULT_RATES, ...(st.live ? st.live.rates : {}) }; st.edited = false; closeSheets(); render(); loadLive(); };
 document.addEventListener('visibilitychange', () => { if (!document.hidden) loadLive(); });
 loadLive();
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+if ('serviceWorker' in navigator) {
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloaded = false;
+  // A new version took over: reload once so the screen shows it right away
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController && !reloaded) { reloaded = true; location.reload(); } });
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((reg) => {
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update(); });
+  });
+}
 </script>
 
 </body>
