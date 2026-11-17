@@ -178,7 +178,7 @@ header small{display:block;font:500 11px/1.2 var(--fd);letter-spacing:.18em;colo
   <p>ใส่ราคา 1 หน่วยเป็นบาท ดูเรทจริงจากแอปธนาคารหรือร้านแลกเงิน แล้วกรอกตามนั้น ระบบจำไว้ในเครื่องนี้</p>
   <div id="rateList"></div>
   <div class="actions"><button type="button" class="btn" id="resetRates">คืนค่าเริ่มต้น</button><button type="button" class="btn main" id="saveRates">บันทึก</button></div>
-  <p class="ver" id="ver">เวอร์ชัน 17 พ.ย. 69 10:35 น.</p>
+  <p class="ver" id="ver">เวอร์ชัน 17 พ.ย. 69 10:37 น.</p>
 </div></div>
 
 <div class="sheet" id="ftmoSheet" hidden><div class="panel">
@@ -429,6 +429,26 @@ if ('serviceWorker' in navigator) {
     document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update(); });
   });
 }
+// Self-update: compare this page's build id with version.txt on the server.
+// If the server is newer, wipe caches + service worker and reload (once per new id, to avoid loops).
+const BUILD_ID = '1794886650690';
+async function hardRefresh() {
+  try { for (const k of await caches.keys()) await caches.delete(k); } catch (e) { /* ignore */ }
+  try { for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); } catch (e) { /* ignore */ }
+  location.replace(location.pathname + '?u=' + Date.now());
+}
+async function checkUpdate() {
+  try {
+    const id = (await (await fetch('version.txt?t=' + Date.now(), { cache: 'no-store' })).text()).trim();
+    if (!id || id === BUILD_ID) return;
+    const key = 'fx-upd-' + id;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, '1');
+    hardRefresh();
+  } catch (e) { /* offline */ }
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) checkUpdate(); });
+checkUpdate();
 </script>
 
 </body>
