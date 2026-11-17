@@ -107,6 +107,27 @@ header small{display:block;font:500 11px/1.2 var(--fd);letter-spacing:.18em;colo
 .rg{margin:10px 0 2px;padding:4px 2px;font:700 12px/1.2 var(--fth);letter-spacing:.06em;color:var(--blood);border-bottom:2px solid var(--blood)}
 .rg:first-child{margin-top:0}
 .nores{color:#5d4c3a;font-size:14px;padding:10px 2px}
+.hbtns{display:flex;gap:6px;flex:none}
+.qlbl{margin:0 0 -4px;font:600 12.5px/1.3 var(--fth);color:var(--plate);text-shadow:0 1px 2px #000}
+.qlbl b{color:var(--brass);font-family:var(--fd);font-variant-numeric:tabular-nums}
+.ghost.hot{background:var(--blood);border-color:var(--blood-hi);color:#fff}
+@media (max-width:360px){header small{display:none}}
+/* FTMO payout sheet */
+.fl{display:grid;gap:4px;margin-top:10px;font:600 14px/1.3 var(--fth)}
+.fin{display:flex;align-items:center;border:1.5px solid var(--plate-line);border-radius:8px;background:#fbf5e8;overflow:hidden}
+.fin:focus-within{border-color:var(--blood)}
+.fin span{padding:0 10px;font:700 18px var(--fd);color:#5d4c3a}
+.fin input{flex:1;min-width:0;border:0;background:transparent;padding:11px 10px 11px 0;font:600 22px var(--fd);color:var(--plate-ink);text-align:right;font-variant-numeric:tabular-nums}
+.fin input:focus{outline:0}
+.splits{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.splits .fin{width:96px}
+.splits .fin input{font-size:18px;padding:8px 6px 8px 0}
+.res{margin-top:14px;border-radius:10px;background:var(--leather);color:var(--plate);padding:14px;display:grid;gap:6px}
+.res .big{font:700 clamp(30px,9vw,38px)/1.05 var(--fd);color:#ffd77a;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.res .lbl{font:500 13px/1.3 var(--fth);opacity:.85}
+.res dl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;margin:6px 0 0;padding-top:8px;border-top:1px dashed rgba(233,220,194,.35);font-size:14px}
+.res dt{opacity:.85}.res dd{margin:0;text-align:right;font:600 15px var(--fd);font-variant-numeric:tabular-nums}
+.note{margin:10px 0 0 !important;font-size:12px !important}
 .opt{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;border-radius:6px;padding:10px;text-align:left;cursor:pointer;color:var(--plate-ink)}
 .opt[aria-current="true"]{background:var(--leather);color:var(--plate)}
 .opt b{font:700 16px/1 var(--fd);width:46px;letter-spacing:.05em}
@@ -125,7 +146,7 @@ header small{display:block;font:500 11px/1.2 var(--fd);letter-spacing:.18em;colo
 <div class="app">
   <header>
     <div class="crest"><span class="badge" aria-hidden="true">฿</span><div><small>Currency Converter</small><h1>แปลงค่าเงิน</h1></div></div>
-    <button type="button" class="ghost" id="editRates">แก้เรท</button>
+    <div class="hbtns"><button type="button" class="ghost hot" id="openFtmo">FTMO</button><button type="button" class="ghost" id="editRates">แก้เรท</button></div>
   </header>
 
   <div class="board">
@@ -135,6 +156,7 @@ header small{display:block;font:500 11px/1.2 var(--fd);letter-spacing:.18em;colo
   </div>
   <p class="rateline" id="rateline"></p>
 
+  <p class="qlbl" id="quickLbl"></p>
   <div class="quick" id="quick"></div>
 
   <div class="pad" id="pad">
@@ -152,6 +174,25 @@ header small{display:block;font:500 11px/1.2 var(--fd);letter-spacing:.18em;colo
   <p>ใส่ราคา 1 หน่วยเป็นบาท ดูเรทจริงจากแอปธนาคารหรือร้านแลกเงิน แล้วกรอกตามนั้น ระบบจำไว้ในเครื่องนี้</p>
   <div id="rateList"></div>
   <div class="actions"><button type="button" class="btn" id="resetRates">คืนค่าเริ่มต้น</button><button type="button" class="btn main" id="saveRates">บันทึก</button></div>
+</div></div>
+
+<div class="sheet" id="ftmoSheet" hidden><div class="panel">
+  <h2>คำนวณเงินถอน FTMO</h2>
+  <p>ใส่กำไรในบัญชี แล้วเลือกส่วนแบ่งที่คุณได้ ระบบแปลงเป็นบาทด้วยเรทดอลลาร์ปัจจุบัน</p>
+  <label class="fl" for="fProfit">กำไรในบัญชี (USD)<div class="fin"><span>$</span><input type="text" inputmode="decimal" id="fProfit" autocomplete="off"></div></label>
+  <div class="fl">ส่วนแบ่งที่คุณได้
+    <div class="splits" id="fSplits">
+      <button type="button" class="tab" data-s="80">80%</button><button type="button" class="tab" data-s="90">90%</button><button type="button" class="tab" data-s="100">100%</button>
+      <div class="fin"><input type="text" inputmode="decimal" id="fSplit" aria-label="ส่วนแบ่งเป็นเปอร์เซ็นต์"><span>%</span></div>
+    </div>
+  </div>
+  <div class="res" aria-live="polite">
+    <span class="lbl">เงินที่คุณได้ (บาท)</span>
+    <span class="big" id="fThb">฿0</span>
+    <dl><dt>คุณได้ (USD)</dt><dd id="fUsd">$0</dd><dt id="fCutLbl">FTMO เก็บ</dt><dd id="fCut">$0</dd><dt>เรท 1 USD</dt><dd id="fRate">-</dd></dl>
+  </div>
+  <p class="note">ยอดจริงอาจต่างเล็กน้อย ตามเรทและค่าธรรมเนียมของช่องทางที่ถอน (โอนธนาคาร / Rise / คริปโต)</p>
+  <div class="actions"><button type="button" class="btn main" id="closeFtmo">ปิด</button></div>
 </div></div>
 
 <script>
@@ -215,6 +256,7 @@ function render() {
   $('#toVal').textContent = fmt(conv(a, st.from, st.to));
   $('#rateline').innerHTML = `1 ${st.from} = <b>${fmt(conv(1, st.from, st.to))}</b> ${st.to} · ${srcLabel()}`;
   const others = POPULAR.filter((c) => c !== st.from && c !== st.to).slice(0, 6);
+  $('#quickLbl').innerHTML = `<b>${showAmt(st.amt || '0')} ${st.from}</b> แลกเป็นสกุลอื่นได้ · แตะช่องเพื่อเลือก`;
   $('#quick').innerHTML = others.map((c) => `<button type="button" class="q" data-q="${c}"><b>${c}</b><span>${fmt(conv(a, st.from, c))}</span></button>`).join('');
   save();
 }
@@ -241,7 +283,7 @@ function press(k) {
 }
 $('#pad').addEventListener('click', (e) => { const b = e.target.closest('[data-k]'); if (b) press(b.dataset.k); });
 document.addEventListener('keydown', (e) => {
-  if (!$('#rateSheet').hidden || !$('#pickSheet').hidden) { if (e.key === 'Escape') closeSheets(); return; }
+  if (!$('#rateSheet').hidden || !$('#pickSheet').hidden || !$('#ftmoSheet').hidden) { if (e.key === 'Escape') closeSheets(); return; }
   if (/^[0-9]$/.test(e.key)) press(e.key);
   else if (e.key === '.' || e.key === ',') press('.');
   else if (e.key === 'Backspace') press('back');
@@ -300,7 +342,32 @@ $('#saveRates').onclick = () => {
 };
 $('#resetRates').onclick = () => { st.rates = { ...DEFAULT_RATES }; st.edited = false; closeSheets(); render(); };
 
-function closeSheets() { $('#pickSheet').hidden = true; $('#rateSheet').hidden = true; }
+// FTMO payout: trader keeps `split`% of profit, converted at the current USD rate
+function calcFtmo() {
+  const profit = parseFloat(String(st.fProfit || '').replace(/,/g, '')) || 0;
+  const split = Math.min(100, Math.max(0, parseFloat(st.fSplit) || 0));
+  const usd = profit * split / 100;
+  const rate = st.rates.USD;
+  $('#fThb').textContent = '฿' + fmt(usd * rate);
+  $('#fUsd').textContent = '$' + fmt(usd);
+  $('#fCutLbl').textContent = `FTMO เก็บ ${+(100 - split).toFixed(2)}%`;
+  $('#fCut').textContent = '$' + fmt(profit - usd);
+  $('#fRate').textContent = fmt(rate) + ' บาท';
+  document.querySelectorAll('#fSplits [data-s]').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.s === split)));
+  save();
+}
+$('#openFtmo').onclick = () => {
+  if (st.fSplit == null) st.fSplit = '80';
+  if (st.fProfit == null) st.fProfit = '10000';
+  $('#fProfit').value = st.fProfit; $('#fSplit').value = st.fSplit;
+  calcFtmo(); $('#ftmoSheet').hidden = false;
+};
+$('#fProfit').addEventListener('input', (e) => { st.fProfit = e.target.value; calcFtmo(); });
+$('#fSplit').addEventListener('input', (e) => { st.fSplit = e.target.value; calcFtmo(); });
+$('#fSplits').addEventListener('click', (e) => { const b = e.target.closest('[data-s]'); if (b) { st.fSplit = b.dataset.s; $('#fSplit').value = st.fSplit; calcFtmo(); } });
+$('#closeFtmo').onclick = () => closeSheets();
+
+function closeSheets() { $('#pickSheet').hidden = true; $('#rateSheet').hidden = true; $('#ftmoSheet').hidden = true; }
 document.querySelectorAll('.sheet').forEach((s) => s.addEventListener('click', (e) => { if (e.target === s) closeSheets(); }));
 
 render();
