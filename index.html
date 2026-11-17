@@ -359,10 +359,28 @@ function calcFtmo() {
 $('#openFtmo').onclick = () => {
   if (st.fSplit == null) st.fSplit = '80';
   if (st.fProfit == null) st.fProfit = '10000';
+  st.fProfit = withCommas(st.fProfit);
   $('#fProfit').value = st.fProfit; $('#fSplit').value = st.fSplit;
   calcFtmo(); $('#ftmoSheet').hidden = false;
 };
-$('#fProfit').addEventListener('input', (e) => { st.fProfit = e.target.value; calcFtmo(); });
+// Format "10000.5" as "10,000.5" while typing, keeping the caret after the same digit
+function withCommas(raw) {
+  let s = String(raw).replace(/[^\d.]/g, '');
+  const dot = s.indexOf('.');
+  if (dot >= 0) s = s.slice(0, dot + 1) + s.slice(dot + 1).replace(/\./g, '').slice(0, 2);
+  const [i, f] = s.split('.');
+  const int = (i || '').replace(/^0+(?=\d)/, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return f !== undefined ? (int || '0') + '.' + f : int;
+}
+$('#fProfit').addEventListener('input', (e) => {
+  const el = e.target;
+  const digitsBefore = el.value.slice(0, el.selectionStart).replace(/[^\d.]/g, '').length;
+  el.value = withCommas(el.value);
+  let pos = 0, seen = 0;
+  while (pos < el.value.length && seen < digitsBefore) { if (/[\d.]/.test(el.value[pos])) seen++; pos++; }
+  el.setSelectionRange(pos, pos);
+  st.fProfit = el.value; calcFtmo();
+});
 $('#fSplit').addEventListener('input', (e) => { st.fSplit = e.target.value; calcFtmo(); });
 $('#fSplits').addEventListener('click', (e) => { const b = e.target.closest('[data-s]'); if (b) { st.fSplit = b.dataset.s; $('#fSplit').value = st.fSplit; calcFtmo(); } });
 $('#closeFtmo').onclick = () => closeSheets();
