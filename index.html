@@ -110,6 +110,8 @@ header small{display:block;font:500 11px/1.2 var(--fd);letter-spacing:.18em;colo
 .hbtns{display:flex;gap:6px;flex:none}
 .rrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 8px}
 .pairreset{border:1.5px solid var(--brass);background:rgba(0,0,0,.35);color:var(--plate);border-radius:999px;padding:3px 10px;font:600 12.5px/1.3 var(--fth);cursor:pointer}
+.pairreset:disabled{opacity:.45;cursor:default}
+.ver{margin:10px 0 0 !important;font-size:11.5px !important;text-align:center}
 .qlbl{margin:0 0 -4px;font:600 12.5px/1.3 var(--fth);color:var(--plate);text-shadow:0 1px 2px #000}
 .qlbl b{color:var(--brass);font-family:var(--fd);font-variant-numeric:tabular-nums}
 .ghost.hot{background:var(--blood);border-color:var(--blood-hi);color:#fff}
@@ -156,7 +158,7 @@ header small{display:block;font:500 11px/1.2 var(--fd);letter-spacing:.18em;colo
     <div class="mid"><button type="button" class="swap" id="swap" aria-label="สลับสกุลเงิน"><span>&#8645;</span></button></div>
     <div class="row to"><button type="button" class="cur" id="toBtn"></button><div class="val" id="toVal" aria-live="polite"></div></div>
   </div>
-  <div class="rrow"><p class="rateline" id="rateline"></p><button type="button" class="pairreset" id="resetPair" hidden>&#8634; กลับเป็น USD &rarr; THB</button></div>
+  <div class="rrow"><p class="rateline" id="rateline"></p><button type="button" class="pairreset" id="resetPair">&#8634; กลับเป็น USD &rarr; THB</button></div>
 
   <p class="qlbl" id="quickLbl"></p>
   <div class="quick" id="quick"></div>
@@ -176,6 +178,7 @@ header small{display:block;font:500 11px/1.2 var(--fd);letter-spacing:.18em;colo
   <p>ใส่ราคา 1 หน่วยเป็นบาท ดูเรทจริงจากแอปธนาคารหรือร้านแลกเงิน แล้วกรอกตามนั้น ระบบจำไว้ในเครื่องนี้</p>
   <div id="rateList"></div>
   <div class="actions"><button type="button" class="btn" id="resetRates">คืนค่าเริ่มต้น</button><button type="button" class="btn main" id="saveRates">บันทึก</button></div>
+  <p class="ver" id="ver">เวอร์ชัน 17 พ.ย. 69 10:32 น.</p>
 </div></div>
 
 <div class="sheet" id="ftmoSheet" hidden><div class="panel">
@@ -258,7 +261,7 @@ function render() {
   $('#toVal').textContent = fmt(conv(a, st.from, st.to));
   $('#rateline').innerHTML = `1 ${st.from} = <b>${fmt(conv(1, st.from, st.to))}</b> ${st.to} · ${srcLabel()}`;
   const others = POPULAR.filter((c) => c !== st.from && c !== st.to).slice(0, 6);
-  $('#resetPair').hidden = st.from === 'USD' && st.to === 'THB';
+  $('#resetPair').disabled = st.from === 'USD' && st.to === 'THB';
   $('#quickLbl').innerHTML = `<b>${showAmt(st.amt || '0')} ${st.from}</b> แลกเป็นสกุลอื่นได้ · แตะช่องเพื่อเลือก`;
   $('#quick').innerHTML = others.map((c) => `<button type="button" class="q" data-q="${c}"><b>${c}</b><span>${fmt(conv(a, st.from, c))}</span></button>`).join('');
   save();
